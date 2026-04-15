@@ -41,7 +41,7 @@ export const signup = async (req,res) => {
                 }
             });
         } catch (error) {
-            return res.status(500).json({message: "Internal Server Error"})
+            return res.status(500).json({message: "Internal Server Error",error});
         }
 }
 
@@ -78,7 +78,7 @@ export const login = async (req,res) => {
             })
 
             res.status(201).json({
-                message:"Login Successfully",
+                message:`${user.fullname} Login Successfully`,
                 user: {                        
                     id: user._id,
                     fullname: user.fullname,
@@ -87,17 +87,16 @@ export const login = async (req,res) => {
                 }
             });
         } catch (error) {
-            return res.status(500).json({message: "Internal Server Error"})
+            return res.status(500).json({message: "Internal Server Error",error});
         }
 }
 
 export const logout = async (req,res) => {
-    try{
-     
+    try{ 
         res.clearCookie("token");
         return res.status(200).json({ message: "Logged Out Successfully" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({message: "Internal Server Error",error});
     }
 }
