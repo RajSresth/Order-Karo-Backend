@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import User from "../model/user.model.js";
 import validate from "../utils/validate.js";
 import { generateToken } from "../utils/jwt.utils.js";
+import {sendMail} from "../utils/mail.js";
 
 export const signup = async (req,res) => {
         try {
@@ -100,3 +101,32 @@ export const logout = async (req,res) => {
         return res.status(500).json({message: "Internal Server Error",error});
     }
 }
+
+
+export const sendOtp = async (req,res) => {
+    try {
+        const {email} = req.body;
+        const user = await User.findOne({email});
+
+        if(!user)
+        {
+            return res.status(400).json({message:"User does not Exist"})
+        }
+
+        // create 4-digit otp
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+        user.otp = otp;
+        user.otpExpiresAt = Date.now() + 5 * 60 * 1000;
+        user.isOtpVerified = false;
+
+        await user.save();
+        await sendMail(user.email,otp);
+
+        res.status(200).json({message: "OTP send successfully on your registered email"})
+
+    } catch (error) {
+        res.status(500).json({message:"send otp error",error})
+    }
+}
+
