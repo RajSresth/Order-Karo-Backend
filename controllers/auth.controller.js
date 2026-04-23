@@ -3,6 +3,7 @@ import User from "../model/user.model.js";
 import validate from "../utils/validate.js";
 import { generateToken } from "../utils/jwt.utils.js";
 import {sendMail} from "../utils/mail.js";
+import validator from "validator";
 
 export const signup = async (req,res) => {
         try {
@@ -123,10 +124,69 @@ export const sendOtp = async (req,res) => {
         await user.save();
         await sendMail(user.email,otp);
 
-        res.status(200).json({message: "OTP send successfully on your registered email"})
+       return res.status(200).json({message: "OTP send successfully on your registered email"});
 
     } catch (error) {
-        res.status(500).json({message:"send otp error",error})
+        res.status(500).json({message:"send otp error",error});
+    }
+}
+
+
+export const verifyOtp = async (req, res) => {
+    try {
+        const {email,otp} = req.body;
+        const user = await User.findOne({email});
+
+        if(!user)
+            return res.status(400).json({message:"User does not Exist"});
+
+        if(user.otp !== otp)
+            return res.status(400).json({message: "Invalid OTP"});   
+
+        if(user.otpExpiresAt < Date.now())
+            return res.status(400).json({message: "OTP Expired"});
+
+        user.otp = undefined;
+        user.otpExpiresAt = undefined;
+        user.isOtpVerified = true;
+        await user.save();
+       
+     return  res.status(200).json({message: "OTP Verified Successfully"})
+
+    } catch (error) {        
+        res.status(500).json({message:"Verify otp error",error});
+    }
+}
+
+
+export const resetPassword = async (req, res) => {
+    try {
+        const {email,newPassword} = req.body;
+        const user = await User.findOne({email});
+
+        if(!user)
+        {
+             return res.status(400).json({message:"User does not Exist"});
+        }
+
+        if(!user.isOtpVerified)
+        {
+            return res.status(400).json({message:"Invalid OTP Verification"})
+        }
+
+        if(!validator.isStrongPassword(newPassword, {minLength: 8,minUppercase: 1, minNumbers: 1,minSymbols: 1}))
+        {
+            return res.status(400).json({message: "Invalid Password: Password Must container 1 uppercase,1 lowercase, 1 number and 1 symbol and minimum length is 8"});
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword,10);
+        user.password = hashedPassword;
+        user.isOtpVerified=false; 
+        await user.save();
+
+      return  res.status(201).json({message: "Password Reset Successfully"})
+    } catch (error) {
+        res.status(500).json({message:"Reset Password error",error});   
     }
 }
 
