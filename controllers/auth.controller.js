@@ -176,12 +176,10 @@ export const resetPassword = async (req, res) => {
         minSymbols: 1,
       })
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid Password: Password Must container 1 uppercase,1 lowercase, 1 number and 1 symbol and minimum length is 8",
-        });
+      return res.status(400).json({
+        message:
+          "Invalid Password: Password Must container 1 uppercase,1 lowercase, 1 number and 1 symbol and minimum length is 8",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -197,51 +195,48 @@ export const resetPassword = async (req, res) => {
 
 export const googleAuthSinup = async (req, res) => {
   try {
-    const { fullname, email, mobile, role } = req.body;    
+    const { fullname, email, mobile, role } = req.body;
     let user = await User.findOne({ email });
 
-    if(user)
-    {
+    if (user) {
       return res.status(400).json({ message: "User Already Exist" });
     }
-   
+
     user = await User.create({
-            fullname,
-            email,
-            mobile,
-            role,
-        });
+      fullname,
+      email,
+      mobile,
+      role,
+    });
 
     return res.status(201).json({
-          message: "User Created Successfully",
-          user: {
-              id: user._id,
-              fullname: user.fullname,
-              email: user.email,
-              role: user.role,
-          },
-    });   
-  
+      message: "User Created Successfully",
+      user: {
+        id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
-      
-      if (error.name === "ValidationError") {
-        return res.status(400).json({ message: error.message });
-      }
-    return res.status(500).json({ message: "Internal Server Error", error });
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(500).json({ message: "Google Auth Signup Error", error });
   }
 };
 
-export const googleAuthLogin = async (req,res) => {
+export const googleAuthLogin = async (req, res) => {
   try {
-      const {email,role} = req.body;
+    const { email, role } = req.body;
 
-      let user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
-      if (!user) {
-        return res.status(400).json({ message: "Invalid Email" });
-      }
+    if (!user) {
+      return res.status(400).json({ message: "Invalid Email" });
+    }
 
-      const token = await generateToken({ id: user._id, role: user.role });
+    const token = await generateToken({ id: user._id, role: user.role });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -259,8 +254,7 @@ export const googleAuthLogin = async (req,res) => {
         role: user.role,
       },
     });
-
   } catch (error) {
-    
+    res.status(500).json({ message: "Google Auth Login Error", error });
   }
-}
+};
