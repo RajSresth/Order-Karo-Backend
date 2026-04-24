@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator from "validator";
 
 const userSchema = new mongoose.Schema(
   {
@@ -7,10 +8,16 @@ const userSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    mobile: {
+     mobile: {
       type: String,
       trim: true,
       required: true,
+      validate: {
+        validator: function (mobile) {
+          return validator.isMobilePhone(mobile, "en-IN");
+        },
+        message: "Invalid Mobile Number",
+      },
     },
     email: {
       type: String,
