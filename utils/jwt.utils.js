@@ -6,5 +6,5 @@ export const generateToken = (payload) => {
 }
 
 export const verifyToken = (token) => {
-    return jwt.verify(token,process.env.JWT_SECRET)
+    return jwt.verify(token,process.env.JWT_SECRET);
 }

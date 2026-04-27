@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.routes.js"
+import userRoutes from "./routes/user.routes.js";
 dotenv.config();
 const app = express();
 
@@ -28,6 +29,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 app.use("/api/auth",authRoutes);
+app.use("/api/user",userRoutes);
 
 
 const startServer = async () => {
