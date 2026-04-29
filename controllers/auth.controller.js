@@ -77,7 +77,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: false,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "none",
+      sameSite: "lax",
     });
 
     res.status(201).json({
@@ -242,7 +242,7 @@ export const googleAuthLogin = async (req, res) => {
       httpOnly: true,
       secure: false,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "none", // "lax"  
+      sameSite: "lax", // "lax"  
     });
 
     return res.status(201).json({
