@@ -99,7 +99,6 @@ export const logout = async (req, res) => {
     res.clearCookie("token");
     return res.status(200).json({ message: "Logged Out Successfully" });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
@@ -242,7 +241,7 @@ export const googleAuthLogin = async (req, res) => {
       httpOnly: true,
       secure: false,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "lax", // "lax"  
+      sameSite: "lax", // "lax"
     });
 
     return res.status(201).json({

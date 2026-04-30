@@ -4,7 +4,7 @@ const authRoutes = express.Router()
 
 authRoutes.post("/register",signup);
 authRoutes.post("/login",login);
-authRoutes.post("/logout",logout);
+authRoutes.get("/logout",logout);
 authRoutes.post("/send-otp",sendOtp);
 authRoutes.post("/verify-otp",verifyOtp);
 authRoutes.post("/reset-password",resetPassword);
