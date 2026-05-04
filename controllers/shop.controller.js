@@ -1,0 +1,90 @@
+import Shop from "../model/shop.model.js";
+import uploadOnCloudinary from "../utils/cloudinary.js";
+
+export const createShop = async (req, res) => {
+  try {
+    const { name, city, state, address } = req.body;
+    const userId = req?.user?.id;
+    let image;
+    if (req.file) {
+      image = await uploadOnCloudinary(req.file.path);
+    }
+
+    let shop = await Shop.findOne({ owner: userId, name: name });
+    if (shop) {
+      return res
+        .status(400)
+        .json({ message: "Shop with this name already exists" });
+    }
+
+    shop = await Shop.create({ name, city, state, address, image, owner: userId });
+    await shop.populate("owner");
+
+    return res.status(201).json({ message: "Shop Created", shop });
+  } catch (error) {
+    return res.status(500).json({ message: "Create Shop error", error });
+  }
+};
+
+export const editShop = async (req, res) => {
+  try {
+    const { name, city, state, address } = req.body;
+    const { shopId } = req.params;
+    const userId = req?.user?.id;
+    let image;
+    if (req.file) {
+      image = await uploadOnCloudinary(req.file.path);
+    }
+
+    const shop = await Shop.findOneAndUpdate(
+      { _id: shopId, owner: userId },
+      { name, city, state, address, ...(image && { image }) },
+      { new: true },
+    ).populate("owner");
+
+    if (!shop) {
+      return res.status(404).json({ message: "Shop not found" });
+    }
+
+    return res.status(200).json({ message: "Shop Updated", shop });
+  } catch (error) {
+    return res.status(500).json({ message: "Edit Shop error", error });
+  }
+};
+
+
+export const getMyShop = async (req,res) => {
+  try {
+    const userId = req?.user?.id;
+      const shop = await Shop.findOne({owner:userId}).populate("owner items");
+
+      if(!shop)
+      {
+        return res.status(400).json({message: "Shop not found"});
+      }
+
+      return res.status(200).json({message:"", shop})
+  } catch (error) {
+     return res.status(500).json({ message: "Get my shop error", error });
+  }
+}
+
+
+export const removeShop = async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    const userId = req?.user?.id;
+
+    const shop = await Shop.findOneAndDelete({ _id: shopId, owner: userId });
+    if (!shop) {
+      return res.status(404).json({ message: "Shop not found" });
+    }
+
+    // shop ke saare items bhi delete karo
+    await Item.deleteMany({ shop: shopId });
+
+    return res.status(200).json({ message: "Shop deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Remove shop error", error });
+  }
+};

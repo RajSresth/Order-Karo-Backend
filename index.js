@@ -6,6 +6,8 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.routes.js"
 import userRoutes from "./routes/user.routes.js";
+import shopRoutes from "./routes/shop.routes.js";
+import itemRoutes from "./routes/item.routes.js";
 dotenv.config();
 const app = express();
 
@@ -30,7 +32,8 @@ app.use("/api", limiter);
 
 app.use("/api/auth",authRoutes);
 app.use("/api/user",userRoutes);
-
+app.use("/api/shop",shopRoutes);
+app.use("/api/item",itemRoutes);
 
 const startServer = async () => {
   try {
