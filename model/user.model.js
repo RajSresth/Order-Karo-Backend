@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-     mobile: {
+    mobile: {
       type: String,
       trim: true,
       required: true,
@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin", "rider"],
+      enum: ["user", "owner", "admin", "rider"],
       trim: true,
       required: true,
     },

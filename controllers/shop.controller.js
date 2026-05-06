@@ -1,5 +1,6 @@
 import Shop from "../model/shop.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
+import Item from "../model/item.model.js";
 
 export const createShop = async (req, res) => {
   try {
@@ -8,6 +9,8 @@ export const createShop = async (req, res) => {
     let image;
     if (req.file) {
       image = await uploadOnCloudinary(req.file.path);
+    } else {
+      return res.status(400).json({ message: "Shop image is required" });
     }
 
     let shop = await Shop.findOne({ owner: userId, name: name });
@@ -17,7 +20,14 @@ export const createShop = async (req, res) => {
         .json({ message: "Shop with this name already exists" });
     }
 
-    shop = await Shop.create({ name, city, state, address, image, owner: userId });
+    shop = await Shop.create({
+      name,
+      city,
+      state,
+      address,
+      image,
+      owner: userId,
+    });
     await shop.populate("owner");
 
     return res.status(201).json({ message: "Shop Created", shop });
@@ -52,23 +62,16 @@ export const editShop = async (req, res) => {
   }
 };
 
-
-export const getMyShop = async (req,res) => {
+export const getMyShops = async (req, res) => {
   try {
     const userId = req?.user?.id;
-      const shop = await Shop.findOne({owner:userId}).populate("owner items");
+    const shops = await Shop.find({ owner: userId }).populate("owner items");
 
-      if(!shop)
-      {
-        return res.status(400).json({message: "Shop not found"});
-      }
-
-      return res.status(200).json({message:"", shop})
+    return res.status(200).json({ shops });
   } catch (error) {
-     return res.status(500).json({ message: "Get my shop error", error });
+    return res.status(500).json({ message: "Get my shops error", error });
   }
-}
-
+};
 
 export const removeShop = async (req, res) => {
   try {
