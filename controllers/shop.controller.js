@@ -67,9 +67,10 @@ export const getMyShops = async (req, res) => {
     const userId = req?.user?.id;
     const shops = await Shop.find({ owner: userId }).populate("owner items");
 
-    if(!shops)
-    {
-      return res.status(400).json({message: "shop not found please create your shop"})
+    if (!shops) {
+      return res
+        .status(400)
+        .json({ message: "shop not found please create your shop" });
     }
     return res.status(200).json({ shops });
   } catch (error) {

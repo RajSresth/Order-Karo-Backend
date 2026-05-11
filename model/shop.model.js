@@ -36,8 +36,10 @@ const shopSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
+
+shopSchema.index({ owner: 1, name: 1 }, { unique: true });
 
 const Shop = mongoose.model("Shop", shopSchema);
 export default Shop;
