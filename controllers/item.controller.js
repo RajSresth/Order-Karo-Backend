@@ -4,7 +4,7 @@ import uploadOnCloudinary from "../utils/cloudinary.js";
 
 export const createItem = async (req, res) => {
   try {
-    const { name, category, foodType, price, shopId } = req.body; // shopId add kiya
+    const { name, category, foodType, price, description, shopId } = req.body; // shopId add kiya
     const userId = req?.user?.id;
 
     let image;
@@ -24,6 +24,7 @@ export const createItem = async (req, res) => {
       category,
       foodType,
       price,
+      description,
       image,
       shop: shop._id,
     });
@@ -32,7 +33,7 @@ export const createItem = async (req, res) => {
     await shop.save();
     await shop.populate("items owner");
 
-    return res.status(201).json({ message: "Item created successfully", shop });
+    return res.status(201).json({ message: "Item created successfully", item });
   } catch (error) {
     return res.status(500).json({ message: "Create Item Error", error });
   }
