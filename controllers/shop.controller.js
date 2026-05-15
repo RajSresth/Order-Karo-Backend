@@ -38,7 +38,7 @@ export const createShop = async (req, res) => {
 
 export const editShop = async (req, res) => {
   try {
-    const { name, city, state, address } = req.body;
+    const { name, city, state, address, openTime, closeTime } = req.body;
     const { shopId } = req.params;
     const userId = req?.user?.id;
     let image;
@@ -48,7 +48,15 @@ export const editShop = async (req, res) => {
 
     const shop = await Shop.findOneAndUpdate(
       { _id: shopId, owner: userId },
-      { name, city, state, address, ...(image && { image }) },
+      {
+        name,
+        city,
+        state,
+        address,
+        openTime,
+        closeTime,
+        ...(image && { image }),
+      },
       { new: true },
     ).populate("owner");
 
@@ -88,11 +96,33 @@ export const removeShop = async (req, res) => {
       return res.status(404).json({ message: "Shop not found" });
     }
 
-    // shop ke saare items bhi delete karo
     await Item.deleteMany({ shop: shopId });
 
     return res.status(200).json({ message: "Shop deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Remove shop error", error });
+  }
+};
+
+export const toggleShopStatus = async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    const userId = req?.user?.id;
+
+    const shop = await Shop.findOneAndUpdate(
+      { _id: shopId, owner: userId },
+      [{ $set: { isOpen: { $not: "$isOpen" } } }],
+      { new: true },
+    );
+
+    if (!shop) {
+      return res.status(404).json({ message: "Shop not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Shop status updated", isOpen: shop.isOpen });
+  } catch (error) {
+    return res.status(500).json({ message: "Toggle status error", error });
   }
 };

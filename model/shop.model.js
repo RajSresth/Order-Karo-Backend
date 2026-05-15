@@ -27,6 +27,18 @@ const shopSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isOpen: {
+      type: Boolean,
+      default: true,
+    },
+    openTime: {
+      type: String,
+      default: "11:00",
+    },
+    closeTime: {
+      type: String,
+      default: "23:00",
+    },
     items: [
       {
         type: mongoose.Schema.Types.ObjectId,
