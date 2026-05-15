@@ -29,7 +29,7 @@ const shopSchema = new mongoose.Schema(
     },
     isOpen: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     openTime: {
       type: String,

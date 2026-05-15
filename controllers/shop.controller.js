@@ -109,20 +109,35 @@ export const toggleShopStatus = async (req, res) => {
     const { shopId } = req.params;
     const userId = req?.user?.id;
 
-    const shop = await Shop.findOneAndUpdate(
-      { _id: shopId, owner: userId },
-      [{ $set: { isOpen: { $not: "$isOpen" } } }],
-      { new: true },
-    );
-
-    if (!shop) {
-      return res.status(404).json({ message: "Shop not found" });
+    if (!shopId || !userId) {
+      return res.status(400).json({
+        message: "Missing shopId or user authentication",
+      });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Shop status updated", isOpen: shop.isOpen });
+    // First find the shop
+    const shop = await Shop.findOne({ _id: shopId, owner: userId });
+
+    if (!shop) {
+      return res.status(404).json({
+        message: "Shop not found or you don't have permission",
+      });
+    }
+
+    // Toggle manually (much safer)
+    shop.isOpen = !shop.isOpen;
+    await shop.save();
+
+    return res.status(200).json({
+      message: "Shop status updated successfully",
+      isOpen: shop.isOpen,
+      shopId: shop._id,
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Toggle status error", error });
+    console.error("Toggle shop status error:", error); // This will now show real error
+    return res.status(500).json({
+      message: "Internal server error while toggling shop status",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
