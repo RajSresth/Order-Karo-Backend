@@ -95,10 +95,10 @@ export const getMyShops = async (req, res) => {
 // For Multiple Shops
 export const getAllShops = async (req, res) => {
   try {
-    const shops = await Shop.find({ isOpen: true })
+    const shops = await Shop.find({})
       .populate("owner", "name email")
       .populate("items");
-    return res.status(200).json({ restaurants: shops });
+    return res.status(200).json({shops});
   } catch (error) {
     return res.status(500).json({ message: "Get all shops error", error });
   }
