@@ -74,6 +74,7 @@ export const editShop = async (req, res) => {
   }
 };
 
+// For Single Shop
 export const getMyShops = async (req, res) => {
   try {
     const userId = req?.user?.id;
@@ -87,6 +88,19 @@ export const getMyShops = async (req, res) => {
     return res.status(200).json({ shops });
   } catch (error) {
     return res.status(500).json({ message: "Get my shops error", error });
+  }
+};
+
+
+// For Multiple Shops
+export const getAllShops = async (req, res) => {
+  try {
+    const shops = await Shop.find({ isOpen: true })
+      .populate("owner", "name email")
+      .populate("items");
+    return res.status(200).json({ restaurants: shops });
+  } catch (error) {
+    return res.status(500).json({ message: "Get all shops error", error });
   }
 };
 

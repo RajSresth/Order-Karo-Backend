@@ -90,5 +90,3 @@ export const removeItem = async (req, res) => {
     return res.status(500).json({ message: "Remove item error", error });
   }
 };
-
-// get item by id controller for edit help
